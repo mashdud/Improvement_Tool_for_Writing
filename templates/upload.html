@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Improvement Tool - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome {
+            font-size: 1.5em;
+            color: #2c3e50;
+        }
+
+        .logout {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .logout:hover {
+            background-color: #c0392b;
+        }
+
+        .upload-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            position: relative;
+        }
+
+        .file-drop-zone:hover {
+            border-color: #2980b9;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-info {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .selected-file {
+            margin-top: 10px;
+            color: #2c3e50;
+        }
+
+        .upload-btn {
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+
+        .upload-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .submissions-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .submission-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .submission-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .submission-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.9em;
+            transition: opacity 0.3s;
+        }
+
+        .view-btn {
+            background-color: #3498db;
+        }
+
+        .download-btn {
+            background-color: #2ecc71;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            border: none;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error {
+            background-color: #fdeaea;
+            color: #e74c3c;
+        }
+
+        .success {
+            background-color: #e8f8f5;
+            color: #27ae60;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .submission-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="welcome">
+                Welcome, <span id="username">{{ username }}</span>!
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        </div>
+
+        <div class="upload-section">
+            <h2>Upload Document</h2>
+            <form id="uploadForm" class="upload-form">
+                <div class="file-drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" name="file" accept=".pdf,.docx" class="file-input">
+                    <div class="drop-text">Drag and drop your file here or click to browse</div>
+                    <div class="file-info">Supported formats: PDF, DOCX (Max size: 16MB)</div>
+                </div>
+                <div id="selectedFile" class="selected-file"></div>
+                <button type="submit" class="upload-btn" id="uploadBtn" disabled>Upload Document</button>
+            </form>
+            <div id="loading" class="loading">Processing your document...</div>
+            <div id="error" class="message error"></div>
+            <div id="success" class="message success"></div>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div class="submissions-section">
+            <h2>Your Submissions</h2>
+            {% if submissions %}
+                {% for submission in submissions %}
+                    <div class="submission-card">
+                        <h3>{{ submission.filename }}</h3>
+                        <div>Uploaded on: {{ submission.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                        <div class="submission-actions">
+                            <a href="{{ url_for('view_submission', submission_id=submission.id) }}" class="action-btn view-btn">View Feedback</a>
+                            <a href="{{ url_for('download_file', file_id=submission.id) }}" class="action-btn download-btn">Download</a>
+                            <button onclick="deleteSubmission({{ submission.id }})" class="delete-btn">Delete</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No submissions yet. Upload your first document to get started!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const selectedFile = document.getElementById('selectedFile');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+        const feedbackDiv = document.getElementById('feedback');
+
+        function handleFileSelect(file) {
+            if (file) {
+                const maxSize = 16 * 1024 * 1024; // 16MB
+                if (file.size > maxSize) {
+                    showError('File size exceeds 16MB limit');
+                    resetForm();
+                    return;
+                }
+                
+                const validTypes = ['.pdf', '.docx'];
+                const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                if (!validTypes.includes(ext)) {
+                    showError('Invalid file type. Please upload a PDF or DOCX file.');
+                    resetForm();
+                    return;
+                }
+
+                selectedFile.textContent = `Selected: ${file.name}`;
+                uploadBtn.disabled = false;
+            }
+        }
+
+        // Drag and drop handling
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#2ecc71';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3498db';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3498db';
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('Please select a file to upload');
+                return;
+            }
+
+            formData.append('file', file);
+            
+            showLoading();
+            hideMessages();
+            uploadBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(data.message);
+                    if (data.feedback) {
+                        showFeedback(data.feedback);
+                    }
+                    resetForm();
+                    
+                    // Reload page after showing feedback
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    showError(data.error || 'Error uploading file');
+                }
+            } catch (error) {
+                showError('Error uploading file. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        async function deleteSubmission(submissionId) {
+            if (!confirm('Are you sure you want to delete this submission?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/delete-submission/${submissionId}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    showError(data.error || 'Error deleting submission');
+                }
+            } catch (error) {
+                showError('Error deleting submission');
+            }
+        }
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+            feedbackDiv.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+
+        function showFeedback(feedback) {
+            feedbackDiv.innerHTML = `
+                <h3>Analysis Results:</h3>
+                <div style="margin-top: 10px;">
+                    <strong>Grammar and Spelling:</strong>
+                    <p>${feedback.grammar_feedback}</p>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Clarity and Style:</strong>
+                    <p>${feedback.clarity_feedback}</p>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Content Quality:</strong>
+                    <p>${feedback.content_quality_feedback}</p>
+                </div>
+            `;
+            feedbackDiv.style.display = 'block';
+        }
+
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        function hideMessages() {
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            feedbackDiv.style.display = 'none';
+        }
+
+        function resetForm() {
+            fileInput.value = '';
+            selectedFile.textContent = '';
+            uploadBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>

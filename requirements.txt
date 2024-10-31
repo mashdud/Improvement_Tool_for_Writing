@@ -1,0 +1,7 @@
+Flask==2.0.3
+Flask-Cors==3.0.10
+SQLAlchemy psycopg2-binary == 1.4.36
+PyPDF2=3.0.1
+python-docx=1.1.2
+flask-mail=0.10.0
+python-docx =1.1.2
