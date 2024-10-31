@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash
 # Database configuration
 DB_NAME = "improve writting"
 DB_USER = "postgres"
-DB_PASSWORD = "4895"
+DB_PASSWORD = "485"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
