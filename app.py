@@ -20,7 +20,7 @@ app = Flask(__name__)
 
 # Configuration
 app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:4895@localhost:5432/improve writting'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:45@localhost:5432/improve writting'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
