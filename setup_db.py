@@ -8,7 +8,7 @@ DB_NAME = "improve writting"
 DB_USER = "postgres"
 DB_PASSWORD = "485"
 DB_HOST = "localhost"
-DB_PORT = "5432"
+DB_PORT = "jjj"
 
 def connect_to_postgres():
     """Connect to PostgreSQL server"""
